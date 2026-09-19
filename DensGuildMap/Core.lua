@@ -115,8 +115,12 @@ end
 local function createSettings()
     local panel = CreateFrame("Frame")
     panel.name = "DensGuildMap"
+    local icon = panel:CreateTexture(nil, "ARTWORK")
+    icon:SetSize(40, 40)
+    icon:SetPoint("TOPLEFT", 16, -12)
+    icon:SetTexture("Interface\\AddOns\\DensGuildMap\\Media\\Icon")
     local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-    title:SetPoint("TOPLEFT", 16, -16)
+    title:SetPoint("TOPLEFT", 68, -16)
     title:SetText("DensGuildMap")
     local description = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     description:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -12)

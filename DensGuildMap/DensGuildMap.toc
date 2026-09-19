@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: DensGuildMap
+## IconTexture: Interface\AddOns\DensGuildMap\Media\Icon
 ## Notes: Guild location sharing for Forever beta. Use /dgm.
 ## Author: Andrew
 ## Version: 0.1.0-beta
