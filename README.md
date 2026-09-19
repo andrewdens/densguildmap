@@ -2,6 +2,8 @@
 
 An independent guild location addon inspired by GuildMap. No GuildMap source or artwork is included.
 
+*This project was vibe coded with codex, I am a software engineer and reviewed the commits created myself thoroughly*
+
 ## Install and share
 
 Extract `dist/DensGuildMap-0.1.0-beta.zip` into the Forever beta client's `Interface/AddOns` folder. The resulting path must be `Interface/AddOns/DensGuildMap/DensGuildMap.toc`. Restart the client and enable the addon. Each participating guildmate needs this addon; it does not communicate with GuildMap.
