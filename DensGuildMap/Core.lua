@@ -13,6 +13,7 @@ local function remove(name)
     local peer = peers[name]
     if not peer then return end
     for _, icon in ipairs(peer.icons) do
+        if addon.worldMapLocations then addon.worldMapLocations[icon] = nil end
         pins:RemoveWorldMapIcon(addon, icon)
         pins:RemoveMinimapIcon(addon, icon)
         icon:Hide()
@@ -71,6 +72,7 @@ local function receive(message, sender)
     local color = RAID_CLASS_COLORS[data.class]
     for _, icon in ipairs(data.icons) do icon.dot:SetVertexColor(color.r, color.g, color.b) end
     if DensGuildMapDB.show then
+        addon.worldMapLocations[data.icons[1]] = {map = data.map, x = data.x, y = data.y}
         pins:AddWorldMapIconMap(addon, data.icons[1], data.map, data.x, data.y, 3)
         pins:AddMinimapIconMap(addon, data.icons[2], data.map, data.x, data.y, true, false)
     end
@@ -170,6 +172,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
         pins = LibStub("HereBeDragons-Pins-2.0", true)
         ready = pins and C_Map and C_Map.GetPlayerMapPosition and C_ChatInfo and C_ChatInfo.SendAddonMessage
         if not ready then say("Required APIs unavailable. Use /dgm status."); return end
+        addon.InstallMapProjection(pins)
         C_ChatInfo.RegisterAddonMessagePrefix(PREFIX)
         guarded(updateRoster)
         if C_GuildInfo and C_GuildInfo.GuildRoster then C_GuildInfo.GuildRoster() end
@@ -206,6 +209,8 @@ SlashCmdList.DENSGUILDMAP = function(input)
         else
             say("Settings page unavailable. Use /dgm on | off | show | hide.")
         end
+    elseif command == "map" then
+        guarded(addon.PrintMapDiagnostics, say)
     elseif command == "status" then
         local version, build, _, interface = GetBuildInfo()
         local count = 0
@@ -214,6 +219,6 @@ SlashCmdList.DENSGUILDMAP = function(input)
             version, build, interface, ready and "present" or "missing", tostring(db.sharing), count))
         say("Last error: " .. (lastError or "none"))
     else
-        say("/dgm settings: options; on | off: share location; show | hide: map dots; status: diagnostics.")
+        say("/dgm settings: options; on | off: share location; show | hide: map dots; status: diagnostics; map: position diagnostics.")
     end
 end

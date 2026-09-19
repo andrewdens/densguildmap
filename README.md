@@ -27,11 +27,11 @@ Sharing starts enabled. Only current map coordinates, class and level are transm
 1. Install on two characters in the same guild. Enable Lua errors with `/console scriptErrors 1`, then restart the client.
 2. Run `/dgm status` on both. Confirm the interface number and no Lua errors.
 3. Stand outdoors in the same zone. Within 10 seconds each should see the other on the world map and, nearby, the minimap.
-4. Move, change zones, zoom the maps and rotate the minimap. Confirm dots follow correctly.
+4. Move, change zones, zoom the maps and rotate the minimap. Confirm dots follow correctly. On both Kalimdor and Eastern Kingdoms, compare a stationary guildmate against a known landmark while switching between zone and continent views; also test a city. Also zoom out fully to Azeroth with both continents visible. Continent and Azeroth dots use the client's map rectangles, with the library conversion as a fallback. If placement is incorrect, keep that map open outside combat and run `/dgm map` to compare the client position, rectangle projection, and library projection; send that output with `/dgm status`.
 5. Run `/dgm off`: the other player's dot for you should disappear. Turn sharing on again.
 6. Hide/show pins, enter combat, log out, and leave the guild. Confirm stale dots expire within 45–50 seconds and guild changes clear old data.
 
-The bundled mapping library has not been validated against Forever's new maps or API restrictions. The local tests validate our message parser and Lua syntax, not the game engine or library compatibility. Send any Lua error and `/dgm status` output to the addon maintainer before distributing as a stable release.
+The bundled mapping library has not been validated against Forever's new maps or API restrictions. The local tests validate our message parser, Lua syntax, and continent projection with simulated map data, not the game engine or library compatibility. Send any Lua error and `/dgm status` output to the addon maintainer before distributing as a stable release.
 
 ## Libraries
 
