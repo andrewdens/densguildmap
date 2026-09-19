@@ -1,0 +1,12 @@
+## Interface: 16001
+## Title: DensGuildMap
+## Notes: Guild location sharing for Forever beta. Use /dgm.
+## Author: Andrew
+## Version: 0.1.0-beta
+## SavedVariables: DensGuildMapDB
+Libs/LibStub.lua
+Libs/CallbackHandler-1.0.lua
+Libs/HereBeDragons-2.0.lua
+Libs/HereBeDragons-Pins-2.0.lua
+Protocol.lua
+Core.lua
