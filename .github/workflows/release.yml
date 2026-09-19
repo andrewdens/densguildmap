@@ -1,0 +1,51 @@
+name: Publish addon release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate version and package addon
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+
+          version = os.environ['GITHUB_REF_NAME'].removeprefix('v')
+          if not re.fullmatch(r'\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?', version):
+              raise SystemExit('Invalid release version')
+          root = Path('DensGuildMap')
+          toc = (root / 'DensGuildMap.toc').read_text()
+          if not re.search(r'^## Version: ' + re.escape(version) + r'$', toc, re.M):
+              raise SystemExit('Tag version must match the addon TOC version')
+          output = Path('release-output')
+          output.mkdir()
+          archive = output / f'DensGuildMap-{version}.zip'
+          with ZipFile(archive, 'w', ZIP_DEFLATED) as z:
+              for path in sorted(root.rglob('*')):
+                  if path.is_file():
+                      z.write(path, path.as_posix())
+          PY
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          args=(--verify-tag --title "DensGuildMap $RELEASE_TAG" --generate-notes)
+          if [[ "$RELEASE_TAG" == *-* ]]; then
+            args+=(--prerelease)
+          fi
+          gh release create "$RELEASE_TAG" release-output/*.zip "${args[@]}"

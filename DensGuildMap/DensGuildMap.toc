@@ -3,7 +3,7 @@
 ## IconTexture: Interface\AddOns\DensGuildMap\Media\Icon
 ## Notes: Guild location sharing for Forever beta. Use /dgm.
 ## Author: Andrew
-## Version: 0.1.0-beta
+## Version: 0.1.1-beta
 ## SavedVariables: DensGuildMapDB
 Libs/LibStub.lua
 Libs/CallbackHandler-1.0.lua

@@ -6,7 +6,7 @@ An independent guild location addon inspired by GuildMap. No GuildMap source or 
 
 ## Install and share
 
-Extract `dist/DensGuildMap-0.1.0-beta.zip` into the Forever beta client's `Interface/AddOns` folder. The resulting path must be `Interface/AddOns/DensGuildMap/DensGuildMap.toc`. Restart the client and enable the addon. Each participating guildmate needs this addon; it does not communicate with GuildMap.
+Download the addon ZIP from [GitHub Releases](https://github.com/andrewdens/densguildmap/releases) and extract it into the Forever beta client's `Interface/AddOns` folder. Choose `DensGuildMap-<version>.zip` under Assets. The resulting path must be `Interface/AddOns/DensGuildMap/DensGuildMap.toc`. Restart the client and enable the addon. Each participating guildmate needs this addon; it does not communicate with GuildMap.
 
 Your installed beta was 1.60.1.69913 when this prototype was built. Interface 16001 is provisional until confirmed with `/dgm status` in game. This is not yet a verified Forever-compatible release.
 
@@ -36,3 +36,9 @@ The bundled mapping library has not been validated against Forever's new maps or
 ## Libraries
 
 HereBeDragons 2.0 and Pins 2.0: https://github.com/Nevcairiel/HereBeDragons (upstream TOC declares BSD). LibStub and CallbackHandler-1.0: bundled from the installed Titan/Ace libraries; original headers retained. These libraries remain under their upstream licenses.
+
+## Build a release
+
+Run `./build.ps1` in PowerShell to increment the patch version and create a new ZIP in `dist/`. For example, `0.1.0-beta` becomes `DensGuildMap-0.1.1-beta.zip`. Use `./build.ps1 -Version 0.2.0-beta` to choose a version explicitly. The addon version inside the ZIP matches its filename, and existing ZIPs are never overwritten.
+
+Commit the addon changes and push them, then tag that commit with the matching version (for example, `git tag v0.1.2-beta` followed by `git push origin v0.1.2-beta`). GitHub Actions packages the addon and attaches its ZIP to a new GitHub Release automatically. Versions containing a suffix such as `-beta` are marked as prereleases. No manual ZIP upload is needed, and the tag must match the version in `DensGuildMap.toc`.
