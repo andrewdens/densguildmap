@@ -93,6 +93,64 @@ local function guarded(fn, ...)
     local ok, err = pcall(fn, ...)
     if not ok then lastError = tostring(err) end
 end
+local settingsPanel, settingsCategory
+local function refreshSettings()
+    if settingsPanel then
+        settingsPanel.sharing:SetChecked(DensGuildMapDB.sharing)
+        settingsPanel.showPins:SetChecked(DensGuildMapDB.show)
+    end
+end
+local function setSharing(enabled)
+    DensGuildMapDB.sharing = not not enabled
+    if ready and IsInGuild() and not enabled then
+        guarded(C_ChatInfo.SendAddonMessage, PREFIX, "0", "GUILD")
+    end
+    refreshSettings()
+end
+local function setShowPins(enabled)
+    DensGuildMapDB.show = not not enabled
+    if ready then clear() end
+    refreshSettings()
+end
+local function createSettings()
+    local panel = CreateFrame("Frame")
+    panel.name = "DensGuildMap"
+    local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+    title:SetPoint("TOPLEFT", 16, -16)
+    title:SetText("DensGuildMap")
+    local description = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    description:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -12)
+    description:SetText("Share locations with guildmates who also use DensGuildMap.")
+    local function checkbox(label, help, offset, callback)
+        local button = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
+        button:SetPoint("TOPLEFT", 16, offset)
+        button.Text:SetText(label)
+        button:SetScript("OnClick", function(self) callback(self:GetChecked()) end)
+        local hint = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+        hint:SetPoint("TOPLEFT", button, "BOTTOMLEFT", 6, -2)
+        hint:SetText(help)
+        return button
+    end
+    panel.sharing = checkbox("Share my location with my guild",
+        "Send your location every 5 seconds outside combat. Turning this off removes your dot for others.",
+        -80, setSharing)
+    panel.showPins = checkbox("Show guild member dots",
+        "Show received locations on the world map and minimap. Your sharing setting is independent.",
+        -150, setShowPins)
+    local note = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    note:SetPoint("TOPLEFT", 22, -230)
+    note:SetJustifyH("LEFT")
+    note:SetText("Peers are guildmates who recently sent a location; you do not count yourself.\nLocations expire after 45 seconds without an update. Use /dgm status for diagnostics.\n\nChanges are saved automatically. Dots appear as new location updates arrive.")
+    settingsPanel = panel
+    panel:SetScript("OnShow", refreshSettings)
+    refreshSettings()
+    if Settings and Settings.RegisterCanvasLayoutCategory and Settings.RegisterAddOnCategory then
+        settingsCategory = Settings.RegisterCanvasLayoutCategory(panel, panel.name)
+        Settings.RegisterAddOnCategory(settingsCategory)
+    elseif InterfaceOptions_AddCategory then
+        InterfaceOptions_AddCategory(panel)
+    end
+end
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("GUILD_ROSTER_UPDATE")
 frame:RegisterEvent("PLAYER_GUILD_UPDATE")
@@ -104,6 +162,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
         if db.sharing == nil then db.sharing = true end
         if db.show == nil then db.show = true end
         db.size = math.min(32, math.max(8, tonumber(db.size) or 14))
+        guarded(createSettings)
         pins = LibStub("HereBeDragons-Pins-2.0", true)
         ready = pins and C_Map and C_Map.GetPlayerMapPosition and C_ChatInfo and C_ChatInfo.SendAddonMessage
         if not ready then say("Required APIs unavailable. Use /dgm status."); return end
@@ -130,15 +189,19 @@ SlashCmdList.DENSGUILDMAP = function(input)
     local db = DensGuildMapDB
     if not db then return end
     if command == "off" or command == "on" then
-        db.sharing = command == "on"
-        if ready and IsInGuild() and not db.sharing then
-            guarded(C_ChatInfo.SendAddonMessage, PREFIX, "0", "GUILD")
-        end
+        setSharing(command == "on")
         say("Location sharing " .. command .. ".")
     elseif command == "hide" or command == "show" then
-        db.show = command == "show"
-        if ready then clear() end
+        setShowPins(command == "show")
         say(db.show and "Pins will appear as updates arrive." or "Pins hidden; sharing setting unchanged.")
+    elseif command == "settings" then
+        if settingsCategory and Settings.OpenToCategory then
+            Settings.OpenToCategory(settingsCategory:GetID())
+        elseif settingsPanel and InterfaceOptionsFrame_OpenToCategory then
+            InterfaceOptionsFrame_OpenToCategory(settingsPanel)
+        else
+            say("Settings page unavailable. Use /dgm on | off | show | hide.")
+        end
     elseif command == "status" then
         local version, build, _, interface = GetBuildInfo()
         local count = 0
@@ -147,6 +210,6 @@ SlashCmdList.DENSGUILDMAP = function(input)
             version, build, interface, ready and "present" or "missing", tostring(db.sharing), count))
         say("Last error: " .. (lastError or "none"))
     else
-        say("/dgm on | off: share location; show | hide: map dots; status: diagnostics.")
+        say("/dgm settings: options; on | off: share location; show | hide: map dots; status: diagnostics.")
     end
 end

@@ -10,6 +10,7 @@ Your installed beta was 1.60.1.69913 when this prototype was built. Interface 16
 
 ## Features
 
+- Settings > AddOns > DensGuildMap provides location-sharing and map-dot checkboxes. Changes save automatically; `/dgm settings` opens the page.
 - Class-colored dots on the world map and minimap with name and level tooltips.
 - Guild-only messages every five seconds; accepts locations only from online guild roster members.
 - Removes locations after 45 seconds without an update.
